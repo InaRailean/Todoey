@@ -9,15 +9,14 @@
 import UIKit
 import CoreData
 
-class TodoListViewController: UITableViewController{
+class TodoListViewController: UITableViewController {
     
     var itemArray = [Item]()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        
+
         loadItems()
     }
     
@@ -68,7 +67,6 @@ class TodoListViewController: UITableViewController{
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
         
-        
     }
     
     //MARK - Model Manipulation Methods
@@ -91,9 +89,27 @@ class TodoListViewController: UITableViewController{
         }
 
     }
-    
-    
-
-
 }
+
+extension TodoListViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        let predicate = NSPredicate(format : "title CONTAINS[cd] %@", searchBar.text!)
+        
+        request.predicate = predicate
+        
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        
+        request.sortDescriptors = [sortDescriptor]
+        
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("Error fetching data from context \(error)")
+        }
+        
+    }
+}
+
 
