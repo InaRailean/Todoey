@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 class CategoryViewController: SwipeTableViewController{
     
@@ -19,6 +20,8 @@ class CategoryViewController: SwipeTableViewController{
         super.viewDidLoad()
         
         loadCategories()
+        tableView.separatorStyle = .none
+        
     }
 
     //MARK: TableView Datasource Methods
@@ -28,14 +31,18 @@ class CategoryViewController: SwipeTableViewController{
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell =  super.tableView(tableView, cellForRowAt: indexPath)
-        cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No Categories Added Yet"
+        if let category = categoryArray?[indexPath.row] {
+            cell.textLabel?.text = category.name
+            guard let categoryColour = UIColor(hexString: category.colorHex) else {fatalError()}
+            cell.backgroundColor = categoryColour
+            cell.textLabel?.textColor = ContrastColorOf(categoryColour, returnFlat: true)
+        }
         return cell
     }
     
     //MARK: - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "goToItems", sender: self)
-        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -83,6 +90,7 @@ class CategoryViewController: SwipeTableViewController{
         let action = UIAlertAction(title: "Add", style: .default) {(action) in
             let newCategory = Category()
             newCategory.name = textField.text!
+            newCategory.colorHex = UIColor.randomFlat.hexValue()
             self.save(category: newCategory)
         }
         alert.addTextField { (alertTextField) in

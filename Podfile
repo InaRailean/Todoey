@@ -8,4 +8,6 @@ pod 'RealmSwift'
 pod 'SwipeCellKit'
 use_modular_headers!
 
+pod 'ChameleonFramework/Swift', :git => 'https://github.com/ViccAlexander/Chameleon.git' 
+
 end
